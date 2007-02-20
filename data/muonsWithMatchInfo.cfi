@@ -1,0 +1,39 @@
+# -*-SH-*-
+module muonsWithMatchInfo = MuonIdProducer {
+      # input collection names
+      InputTag EBRecHitCollectionLabel       = ecalRecHit:EcalRecHitsEB
+      InputTag EERecHitCollectionLabel       = ecalRecHit:EcalRecHitsEE
+      InputTag CaloTowerCollectionLabel      = towerMaker
+      InputTag HBHERecHitCollectionLabel     = hbhereco
+      InputTag HORecHitCollectionLabel       = horeco
+      InputTag DTRecSegment4DCollectionLabel = dt4DSegments
+      InputTag CSCSegmentCollectionLabel     = cscSegments
+      # input tracks
+      InputTag inputCollectionLabel = rsWithMaterialTracks
+      # input type is muon
+      bool inputTypeIsTrack = true
+      
+      # track associator parameters
+      bool useHcalRecHits = true
+      bool debugWithTruthMatching = true
+      # cone radius
+      double ecalPreselectionCone = 0.03
+      double hcalPreselectionCone = 0.05
+      double muonPreselectionCone = 0.10
+
+      # match parameters
+      double maxAbsDx = 5
+      double maxAbsPullX = 5
+      double maxAbsDy = 9999
+      double maxAbsPullY = 9999
+      
+      # selection parameters
+      double minPt = 5
+      double minP = 5
+      double maxAbsEta = 2.5
+      int32 minNumberOfMatches = 1
+      
+      # output parameters
+      string branchAlias = "muonsWithMatchInfo"
+}
+

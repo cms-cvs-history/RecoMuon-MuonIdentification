@@ -1,0 +1,19 @@
+# -*-SH-*-
+
+
+# include geometry and magnetic field
+include "Geometry/CMSCommonData/data/cmsIdealGeometryXML.cfi"
+include "MagneticField/Engine/data/volumeBasedMagneticField.cfi"
+
+include "Geometry/CaloEventSetup/data/CaloGeometry.cfi"
+include "Geometry/CaloEventSetup/data/CaloTopology.cfi"
+
+include "Geometry/DTGeometry/data/dtGeometry.cfi"
+include "Geometry/RPCGeometry/data/rpcGeometry.cfi"
+include "Geometry/CSCGeometry/data/cscGeometry.cfi"
+include "Geometry/CommonDetUnit/data/bareGlobalTrackingGeometry.cfi"
+
+# muon with detector matching information reconstruction
+include "RecoMuon/MuonIdentification/data/muonsWithMatchInfo.cfi"
+
+sequence muonIdProducerSequence = { muonsWithMatchInfo }
