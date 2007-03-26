@@ -15,5 +15,7 @@ include "Geometry/CommonDetUnit/data/bareGlobalTrackingGeometry.cfi"
 
 # muon with detector matching information reconstruction
 include "RecoMuon/MuonIdentification/data/muonsWithMatchInfo.cfi"
+# modify default TrackDetectorAssociator parameters
+# replace muonsWithMatchInfo.TrackAssociatorParameters.
 
 sequence muonIdProducerSequence = { muonsWithMatchInfo }
