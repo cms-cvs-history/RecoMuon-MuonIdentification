@@ -5,7 +5,7 @@ module muonsWithMatchInfo = MuonIdProducer {
       
       # input tracks
       InputTag inputTrackCollection = ctfWithMaterialTracks
-      InputTag inputMuonCollection  = globalMuon
+      InputTag inputMuonCollection  = globalMuons
       # choose what to use as input
       bool useMuonCollectionAsInput = false
       
