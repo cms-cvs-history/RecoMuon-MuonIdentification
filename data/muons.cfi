@@ -1,0 +1,5 @@
+module muons = MuonProducer {
+
+    InputTag InputObjects = globalMuons
+
+}
