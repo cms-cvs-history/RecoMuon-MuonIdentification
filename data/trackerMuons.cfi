@@ -1,0 +1,51 @@
+# -*-SH-*-
+module trackerMuons = MuonIdProducer {
+      # TrackDetectorAssociator
+      include "TrackingTools/TrackAssociator/data/default.cfi"
+      # MuonCaloConsistency
+      include "RecoMuon/MuonIdentification/data/caloCompatibility.cff"
+      
+      # input tracks
+      InputTag inputTrackCollection = ctfWithMaterialTracks
+      InputTag inputMuonCollection  = globalMuons
+      InputTag inputLinkCollection  = globalMuons
+      # choose what to use as input
+      # {TrackCollection=0, MuonCollection=1, LinkCollection=2}
+      int32 inputType = 0
+      
+      bool fillEnergy = true
+      bool fillMatching = true
+      bool fillIsolation = true
+      bool fillCaloCompatibility = true
+      
+      ######################################
+      # Match parameters
+      double maxAbsDx = 5
+      # OR
+      double maxAbsPullX = 5
+      # AND
+      double maxAbsDy = 9999
+      # OR
+      double maxAbsPullY = 9999
+      
+      #####################################
+      # Selection parameters
+      double minPt = 2
+      double minP = 3.5
+      int32  minNumberOfMatches = 1 
+      # OR
+      double stiffMinPt = 15
+      double stiffMinP = 15
+      int32  stiffMinNumberOfMatches = 0
+      # AND
+      double maxAbsEta = 2.5
+      
+      ####################################
+      # output parameters
+      string branchAlias = "trackerMuons"
+      
+      ####################################
+      # internal
+      bool debugWithTruthMatching = false
+}
+

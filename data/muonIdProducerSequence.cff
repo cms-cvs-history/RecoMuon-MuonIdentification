@@ -1,6 +1,4 @@
 # -*-SH-*-
-
-
 # include geometry and magnetic field
 include "Geometry/CMSCommonData/data/cmsIdealGeometryXML.cfi"
 include "MagneticField/Engine/data/volumeBasedMagneticField.cfi"
@@ -12,13 +10,12 @@ include "Geometry/DTGeometry/data/dtGeometry.cfi"
 include "Geometry/RPCGeometry/data/rpcGeometry.cfi"
 include "Geometry/CSCGeometry/data/cscGeometry.cfi"
 include "Geometry/CommonDetUnit/data/bareGlobalTrackingGeometry.cfi"
+include "Geometry/MuonNumbering/data/muonNumberingInitialization.cfi"
 
-# muon with detector matching information reconstruction
-include "RecoMuon/MuonIdentification/data/muonsWithMatchInfo.cfi"
-# modify default TrackDetectorAssociator parameters
-# replace muonsWithMatchInfo.TrackAssociatorParameters.
+# silicon track based muon with detector matching information reconstruction
+include "RecoMuon/MuonIdentification/data/trackerMuons.cfi"
 
-# muon 
-include "RecoMuon/MuonIdentification/data/muons.cfi"
+# global muons
+include "RecoMuon/MuonIdentification/data/globalMuons.cfi"
 
-sequence muonIdProducerSequence = { muons, muonsWithMatchInfo }
+sequence muonIdProducerSequence = { trackerMuons, muons }

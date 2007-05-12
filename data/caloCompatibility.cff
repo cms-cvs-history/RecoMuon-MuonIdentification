@@ -1,5 +1,5 @@
 # -*-SH-*-
-PSet MuonCaloConsistency =
+PSet MuonCaloCompatibility =
 {
   FileInPath MuonTemplateFileName = "RecoMuon/MuonIdentification/data/MuID_templates_muons_allPt_1_5_norm.root"
   FileInPath PionTemplateFileName = "RecoMuon/MuonIdentification/data/MuID_templates_pions_allPt_1_5_norm.root"
