@@ -2,8 +2,10 @@
 module trackerMuons = MuonIdProducer {
       # TrackDetectorAssociator
       include "TrackingTools/TrackAssociator/data/default.cfi"
-      # MuonCaloConsistency
+      # MuonCaloCompatibility
       include "RecoMuon/MuonIdentification/data/caloCompatibility.cff"
+      # MuonIsolation
+      include "RecoMuon/MuonIdentification/data/isolation.cff"
       
       # input tracks
       InputTag inputTrackCollection = ctfWithMaterialTracks
@@ -49,3 +51,19 @@ module trackerMuons = MuonIdProducer {
       bool debugWithTruthMatching = false
 }
 
+replace trackerMuons.CaloExtractorPSet.TrackAssociatorParameters.EBRecHitCollectionLabel   = ecalRecHit:EcalRecHitsEB
+replace trackerMuons.CaloExtractorPSet.TrackAssociatorParameters.EERecHitCollectionLabel   = ecalRecHit:EcalRecHitsEE
+replace trackerMuons.CaloExtractorPSet.TrackAssociatorParameters.CaloTowerCollectionLabel  = towerMaker
+replace trackerMuons.CaloExtractorPSet.TrackAssociatorParameters.HBHERecHitCollectionLabel = hbhereco
+replace trackerMuons.CaloExtractorPSet.TrackAssociatorParameters.HORecHitCollectionLabel   = horeco
+
+replace trackerMuons.CaloExtractorPSet.TrackAssociatorParameters.useEcal = false      # RecoHits
+replace trackerMuons.CaloExtractorPSet.TrackAssociatorParameters.useHcal = false      # RecoHits
+replace trackerMuons.CaloExtractorPSet.TrackAssociatorParameters.useHO = false        # RecoHits
+replace trackerMuons.CaloExtractorPSet.TrackAssociatorParameters.useCalo = true       # CaloTowers
+replace trackerMuons.CaloExtractorPSet.TrackAssociatorParameters.useMuon = false      # RecoHits
+
+replace trackerMuons.CaloExtractorPSet.TrackAssociatorParameters.dREcalPreselection = 1.0
+replace trackerMuons.CaloExtractorPSet.TrackAssociatorParameters.dRHcalPreselection = 1.0
+replace trackerMuons.CaloExtractorPSet.TrackAssociatorParameters.dREcal = 1.0
+replace trackerMuons.CaloExtractorPSet.TrackAssociatorParameters.dRHcal = 1.0
