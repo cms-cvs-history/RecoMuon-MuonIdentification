@@ -4,6 +4,8 @@ module muons = MuonIdProducer {
       include "TrackingTools/TrackAssociator/data/default.cfi"
       # MuonCaloCompatibility
       include "RecoMuon/MuonIdentification/data/caloCompatibility.cff"
+      # MuonIsolation
+      include "RecoMuon/MuonIdentification/data/isolation.cff"
       
       # input tracks
       InputTag inputTrackCollection = ctfWithMaterialTracks
@@ -15,8 +17,8 @@ module muons = MuonIdProducer {
       
       bool fillEnergy = true
       bool fillMatching = false
-      bool fillIsolation = false
-      bool fillCaloCompatibility = false
+      bool fillIsolation = true
+      bool fillCaloCompatibility = true
       
       ######################################
       # Match parameters
@@ -49,3 +51,7 @@ module muons = MuonIdProducer {
       bool debugWithTruthMatching = false
 }
 
+# isolation configuration
+replace muons.CaloExtractorPSet.TrackAssociatorParameters.useMuon = false 
+replace muons.CaloExtractorPSet.TrackAssociatorParameters.dREcalPreselection = 1.0
+replace muons.CaloExtractorPSet.TrackAssociatorParameters.dRHcalPreselection = 1.0
