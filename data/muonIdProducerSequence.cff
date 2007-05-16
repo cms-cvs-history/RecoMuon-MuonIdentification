@@ -12,6 +12,11 @@ include "Geometry/CSCGeometry/data/cscGeometry.cfi"
 include "Geometry/CommonDetUnit/data/bareGlobalTrackingGeometry.cfi"
 include "Geometry/MuonNumbering/data/muonNumberingInitialization.cfi"
 
+# add the SteppingHelixPropagator to the EventSetup
+include "TrackPropagation/SteppingHelixPropagator/data/SteppingHelixPropagatorAny.cfi"
+include "TrackPropagation/SteppingHelixPropagator/data/SteppingHelixPropagatorAlong.cfi"
+include "TrackPropagation/SteppingHelixPropagator/data/SteppingHelixPropagatorOpposite.cfi"
+
 # silicon track based muon with detector matching information reconstruction
 include "RecoMuon/MuonIdentification/data/trackerMuons.cfi"
 
