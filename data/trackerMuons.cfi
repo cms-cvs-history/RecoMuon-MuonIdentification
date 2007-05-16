@@ -52,6 +52,10 @@ module trackerMuons = MuonIdProducer {
 }
 
 # isolation configuration
+replace trackerMuons.CaloExtractorPSet.TrackAssociatorParameters.useEcal = false 
+replace trackerMuons.CaloExtractorPSet.TrackAssociatorParameters.useHcal = false 
+replace trackerMuons.CaloExtractorPSet.TrackAssociatorParameters.useHO   = false 
+replace trackerMuons.CaloExtractorPSet.TrackAssociatorParameters.useCalo = true
 replace trackerMuons.CaloExtractorPSet.TrackAssociatorParameters.useMuon = false 
 replace trackerMuons.CaloExtractorPSet.TrackAssociatorParameters.dREcalPreselection = 1.0
 replace trackerMuons.CaloExtractorPSet.TrackAssociatorParameters.dRHcalPreselection = 1.0
