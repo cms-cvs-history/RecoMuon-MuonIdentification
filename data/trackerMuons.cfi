@@ -32,15 +32,15 @@ module trackerMuons = MuonIdProducer {
       
       #####################################
       # Selection parameters
-      double minPt = 2
-      double minP = 3.5
+      double minPt = 1.5
+      double minP = 3.0
       int32  minNumberOfMatches = 1 
       # OR
       double stiffMinPt = 15
       double stiffMinP = 15
       int32  stiffMinNumberOfMatches = 0
       # AND
-      double maxAbsEta = 2.5
+      double maxAbsEta = 3.0
       
       ####################################
       # output parameters
@@ -51,19 +51,7 @@ module trackerMuons = MuonIdProducer {
       bool debugWithTruthMatching = false
 }
 
-replace trackerMuons.CaloExtractorPSet.TrackAssociatorParameters.EBRecHitCollectionLabel   = ecalRecHit:EcalRecHitsEB
-replace trackerMuons.CaloExtractorPSet.TrackAssociatorParameters.EERecHitCollectionLabel   = ecalRecHit:EcalRecHitsEE
-replace trackerMuons.CaloExtractorPSet.TrackAssociatorParameters.CaloTowerCollectionLabel  = towerMaker
-replace trackerMuons.CaloExtractorPSet.TrackAssociatorParameters.HBHERecHitCollectionLabel = hbhereco
-replace trackerMuons.CaloExtractorPSet.TrackAssociatorParameters.HORecHitCollectionLabel   = horeco
-
-replace trackerMuons.CaloExtractorPSet.TrackAssociatorParameters.useEcal = true       # RecoHits
-replace trackerMuons.CaloExtractorPSet.TrackAssociatorParameters.useHcal = true       # RecoHits
-replace trackerMuons.CaloExtractorPSet.TrackAssociatorParameters.useHO = true         # RecoHits
-replace trackerMuons.CaloExtractorPSet.TrackAssociatorParameters.useCalo = false      # CaloTowers
-replace trackerMuons.CaloExtractorPSet.TrackAssociatorParameters.useMuon = false      # RecoHits
-
+# isolation configuration
+replace trackerMuons.CaloExtractorPSet.TrackAssociatorParameters.useMuon = false 
 replace trackerMuons.CaloExtractorPSet.TrackAssociatorParameters.dREcalPreselection = 1.0
 replace trackerMuons.CaloExtractorPSet.TrackAssociatorParameters.dRHcalPreselection = 1.0
-replace trackerMuons.CaloExtractorPSet.TrackAssociatorParameters.dREcal = 1.0
-replace trackerMuons.CaloExtractorPSet.TrackAssociatorParameters.dRHcal = 1.0
