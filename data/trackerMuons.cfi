@@ -57,10 +57,10 @@ replace trackerMuons.CaloExtractorPSet.TrackAssociatorParameters.CaloTowerCollec
 replace trackerMuons.CaloExtractorPSet.TrackAssociatorParameters.HBHERecHitCollectionLabel = hbhereco
 replace trackerMuons.CaloExtractorPSet.TrackAssociatorParameters.HORecHitCollectionLabel   = horeco
 
-replace trackerMuons.CaloExtractorPSet.TrackAssociatorParameters.useEcal = false      # RecoHits
-replace trackerMuons.CaloExtractorPSet.TrackAssociatorParameters.useHcal = false      # RecoHits
-replace trackerMuons.CaloExtractorPSet.TrackAssociatorParameters.useHO = false        # RecoHits
-replace trackerMuons.CaloExtractorPSet.TrackAssociatorParameters.useCalo = true       # CaloTowers
+replace trackerMuons.CaloExtractorPSet.TrackAssociatorParameters.useEcal = true       # RecoHits
+replace trackerMuons.CaloExtractorPSet.TrackAssociatorParameters.useHcal = true       # RecoHits
+replace trackerMuons.CaloExtractorPSet.TrackAssociatorParameters.useHO = true         # RecoHits
+replace trackerMuons.CaloExtractorPSet.TrackAssociatorParameters.useCalo = false      # CaloTowers
 replace trackerMuons.CaloExtractorPSet.TrackAssociatorParameters.useMuon = false      # RecoHits
 
 replace trackerMuons.CaloExtractorPSet.TrackAssociatorParameters.dREcalPreselection = 1.0
