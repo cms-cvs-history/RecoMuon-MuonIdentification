@@ -36,8 +36,8 @@ module trackerMuons = MuonIdProducer {
       double minP = 3.0
       int32  minNumberOfMatches = 1 
       # OR
-      double stiffMinPt = 15
-      double stiffMinP = 15
+      double stiffMinPt = 9999
+      double stiffMinP = 9999
       int32  stiffMinNumberOfMatches = 0
       # AND
       double maxAbsEta = 3.0
