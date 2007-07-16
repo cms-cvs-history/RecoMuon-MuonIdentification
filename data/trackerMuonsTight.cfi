@@ -1,0 +1,24 @@
+module trackerMuonsTight = MuonRefProducer {
+      
+      # input
+      InputTag ReferenceCollection = trackerMuons
+      
+      # selector parameters
+      string algorithmType = "LastStation"
+      string arbitrationType = "SegmentAndTrackArbitration"
+      double minPt = 0
+      double minP  = 0
+      int32  minNumberOfMatchedStations = 2
+      #####################################
+      # maximal distance from track to a chamber (negative means that track crossed chamber)
+      double maxChamberDistance = -3
+      # last station requirements
+      double maxAbsDx = 3
+      # OR
+      double maxAbsPullX = 3
+      # AND
+      double maxAbsDy = 3
+      # OR
+      double maxAbsPullY = 3
+
+}
