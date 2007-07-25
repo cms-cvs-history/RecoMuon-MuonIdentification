@@ -25,4 +25,4 @@ include "RecoMuon/MuonIdentification/data/trackerMuonsTight.cfi"
 # global muons
 include "RecoMuon/MuonIdentification/data/globalMuons.cfi"
 
-sequence muonIdProducerSequence = { muons, trackerMuons, trackerMuonsLoose, trackerMuonsTight }
+sequence muonIdProducerSequence = { muons, trackerMuons }
