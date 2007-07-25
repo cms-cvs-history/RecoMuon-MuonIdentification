@@ -22,9 +22,9 @@ module trackerMuons = MuonIdProducer {
       
       ######################################
       # Match parameters
-      double maxAbsDx = 5
+      double maxAbsDx = 3
       # OR
-      double maxAbsPullX = 5
+      double maxAbsPullX = 3
       # AND
       double maxAbsDy = 9999
       # OR
@@ -34,7 +34,7 @@ module trackerMuons = MuonIdProducer {
       # Selection parameters
       double minPt = 1.5
       double minP = 3.0
-      int32  minNumberOfMatches = 1 
+      int32  minNumberOfMatches = 2
       # OR
       double stiffMinPt = 9999
       double stiffMinP = 9999
