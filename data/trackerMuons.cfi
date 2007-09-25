@@ -8,12 +8,8 @@ module trackerMuons = MuonIdProducer {
       include "RecoMuon/MuonIdentification/data/isolation.cff"
       
       # input tracks
-      InputTag inputTrackCollection = ctfWithMaterialTracks
-      InputTag inputMuonCollection  = globalMuons
-      InputTag inputLinkCollection  = globalMuons
-      # choose what to use as input
-      # {TrackCollection=0, MuonCollection=1, LinkCollection=2}
-      int32 inputType = 0
+      VInputTag inputCollectionLabels = { ctfWithMaterialTracks }
+      vstring   inputCollectionTypes = { "inner tracks" }
       
       bool fillEnergy = true
       bool fillMatching = true
