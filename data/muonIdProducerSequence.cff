@@ -23,6 +23,7 @@ include "RecoMuon/MuonIdentification/data/trackerMuonsLoose.cfi"
 include "RecoMuon/MuonIdentification/data/trackerMuonsTight.cfi"
 
 # global muons
-include "RecoMuon/MuonIdentification/data/globalMuons.cfi"
+# include "RecoMuon/MuonIdentification/data/globalMuons.cfi"
+include "RecoMuon/MuonIdentification/data/muons.cfi"
 
-sequence muonIdProducerSequence = { muons, trackerMuons }
+sequence muonIdProducerSequence = { muons }
