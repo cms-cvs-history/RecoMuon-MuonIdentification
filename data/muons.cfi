@@ -20,7 +20,7 @@ module muons = MuonIdProducer {
       # Match parameters
       double maxAbsDx = 3
       # OR
-      double maxAbsPullX = 3
+      double maxAbsPullX = 4
       # AND
       double maxAbsDy = 9999
       # OR
@@ -30,9 +30,9 @@ module muons = MuonIdProducer {
       # Selection parameters
       double minPt = 1.5
       double minP = 3.0
-      int32  minNumberOfMatches = 2
-      # AND
+      int32  minNumberOfMatches = 0
       double maxAbsEta = 3.0
+      bool   addExtraSoftMuons = true
       
       ####################################
       # internal

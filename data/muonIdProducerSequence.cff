@@ -17,13 +17,6 @@ include "TrackPropagation/SteppingHelixPropagator/data/SteppingHelixPropagatorAn
 include "TrackPropagation/SteppingHelixPropagator/data/SteppingHelixPropagatorAlong.cfi"
 include "TrackPropagation/SteppingHelixPropagator/data/SteppingHelixPropagatorOpposite.cfi"
 
-# silicon track based muon with detector matching information reconstruction
-include "RecoMuon/MuonIdentification/data/trackerMuons.cfi"
-include "RecoMuon/MuonIdentification/data/trackerMuonsLoose.cfi"
-include "RecoMuon/MuonIdentification/data/trackerMuonsTight.cfi"
-
-# global muons
-# include "RecoMuon/MuonIdentification/data/globalMuons.cfi"
 include "RecoMuon/MuonIdentification/data/muons.cfi"
 
 sequence muonIdProducerSequence = { muons }
