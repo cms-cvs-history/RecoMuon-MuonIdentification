@@ -1,0 +1,11 @@
+# -*-SH-*-
+module calomuons = CaloMuonProducer {
+      # TrackDetectorAssociator
+      include "TrackingTools/TrackAssociator/data/default.cfi"
+      # MuonCaloCompatibility
+      include "RecoMuon/MuonIdentification/data/caloCompatibility.cff"
+      
+      InputTag inputTracks = ctfWithMaterialTracks
+      InputTag inputMuons = muons
+      double minCaloCompatibility = 0.6
+}

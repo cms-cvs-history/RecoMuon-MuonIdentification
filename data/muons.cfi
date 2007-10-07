@@ -30,9 +30,9 @@ module muons = MuonIdProducer {
       # Selection parameters
       double minPt = 1.5
       double minP = 3.0
-      int32  minNumberOfMatches = 0
+      int32  minNumberOfMatches = 1
       double maxAbsEta = 3.0
-      bool   addExtraSoftMuons = true
+      bool   addExtraSoftMuons = false
       
       ####################################
       # internal

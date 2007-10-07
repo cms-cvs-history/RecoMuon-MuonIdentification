@@ -18,5 +18,6 @@ include "TrackPropagation/SteppingHelixPropagator/data/SteppingHelixPropagatorAl
 include "TrackPropagation/SteppingHelixPropagator/data/SteppingHelixPropagatorOpposite.cfi"
 
 include "RecoMuon/MuonIdentification/data/muons.cfi"
+include "RecoMuon/MuonIdentification/data/calomuons.cfi"
 
-sequence muonIdProducerSequence = { muons }
+sequence muonIdProducerSequence = { muons, calomuons }
