@@ -1,44 +1,15 @@
 # -*-SH-*-
-PSet CaloExtractorPSet = 
-{
-  string ComponentName = "CaloExtractorByAssociator"
-  vstring DepositInstanceLabels = { "ecal", "hcal", "ho" }
+include "RecoMuon/MuonIsolationProducers/data/caloExtractorByAssociatorBlocks.cff"
+include "RecoMuon/MuonIsolationProducers/data/trackExtractorBlocks.cff"
 
-  string PropagatorName = "SteppingHelixPropagatorAny"
+block MIdIsoExtractorPSetBlock = {
+  PSet CaloExtractorPSet = 
+  {
+    using MIsoCaloExtractorByAssociatorTowersBlock
+  }
 
-  include "TrackingTools/TrackAssociator/data/default.cfi"
-  #explicitely set the ones needed in this producer (below)
-
-  untracked string DepositLabel = "Cal"
-  bool UseRecHitsFlag = false
-
-  double DR_Max = 1.0
-  double DR_Veto_E = 0.07
-  double DR_Veto_H = 0.10
-  double DR_Veto_HO = 0.10
-#count a tower if et > threshold
-  double Threshold_E = 0.025
-  double Threshold_H = 0.1
-  double Threshold_HO = 0.1
-#count a tower if e> 3sigma
-  double Noise_EB = 0.025
-  double Noise_EE = 0.1
-  double Noise_HB = 0.2
-  double Noise_HE = 0.2
-  double Noise_HO = 0.2
-
-  double NoiseTow_EB = 0.04
-  double NoiseTow_EE = 0.15
-  untracked bool PrintTimeReport = false
-}
-
-PSet TrackExtractorPSet = 
-{
-  string ComponentName = "TrackExtractor"
-  InputTag inputTrackCollection = ctfWithMaterialTracks
-  untracked string DepositLabel = ""
-  double Diff_r = 0.1
-  double Diff_z = 0.2
-  double DR_Max = 1.0
-  double DR_Veto = 0.01
+  PSet TrackExtractorPSet = 
+  {
+    using MIsoTrackExtractorCtfBlock
+  }
 }

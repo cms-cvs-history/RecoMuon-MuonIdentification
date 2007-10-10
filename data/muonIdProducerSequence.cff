@@ -20,6 +20,7 @@ include "TrackPropagation/SteppingHelixPropagator/data/SteppingHelixPropagatorOp
 # add TrackDetectorAssociator lookup maps to the EventSetup
 include "TrackingTools/TrackAssociator/data/DetIdAssociatorESProducer.cff"
 
+include "RecoMuon/MuonIdentification/data/isolation.cff"
 include "RecoMuon/MuonIdentification/data/muons.cfi"
 include "RecoMuon/MuonIdentification/data/calomuons.cfi"
 
