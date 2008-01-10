@@ -1,0 +1,3 @@
+# -*-SH-*-
+module muons = MuonMerger {}
+sequence mergeMuons = { muons }
