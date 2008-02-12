@@ -1,4 +1,6 @@
 # -*-SH-*-
+include "RecoMuon/MuonIdentification/data/isolation.cff"
+
 module muons = MuonIdProducer {
       # TrackDetectorAssociator
       include "TrackingTools/TrackAssociator/data/default.cfi"
