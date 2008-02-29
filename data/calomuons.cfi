@@ -5,7 +5,7 @@ module calomuons = CaloMuonProducer {
       # MuonCaloCompatibility
       include "RecoMuon/MuonIdentification/data/caloCompatibility.cff"
       
-      InputTag inputTracks = ctfWithMaterialTracks
+      InputTag inputTracks = generalTracks
       InputTag inputMuons = muons
       double minCaloCompatibility = 0.6
 }

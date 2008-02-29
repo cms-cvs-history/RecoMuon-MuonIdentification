@@ -10,7 +10,7 @@ module muons = MuonIdProducer {
       using MIdIsoExtractorPSetBlock
       
       # input tracks
-      VInputTag inputCollectionLabels = { ctfWithMaterialTracks, globalMuons, standAloneMuons:UpdatedAtVtx }
+      VInputTag inputCollectionLabels = { generalTracks, globalMuons, standAloneMuons:UpdatedAtVtx }
       vstring   inputCollectionTypes = { "inner tracks", "links", "outer tracks" }
       
       bool fillEnergy = true
