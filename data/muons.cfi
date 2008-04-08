@@ -1,10 +1,11 @@
 # -*-SH-*-
 include "RecoMuon/MuonIdentification/data/isolation.cff"
 include "RecoMuon/MuonIdentification/data/caloCompatibility.cff"
+include "TrackingTools/TrackAssociator/data/default.cfi"
 
 module muons = MuonIdProducer {
       # TrackDetectorAssociator
-      include "TrackingTools/TrackAssociator/data/default.cfi"
+      using TrackAssociatorParameterBlock
       # MuonCaloCompatibility
       using MuonCaloCompatibilityBlock
       # MuonIsolation

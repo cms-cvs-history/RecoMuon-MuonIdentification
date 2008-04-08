@@ -1,12 +1,12 @@
 # -*-SH-*-
 # MuonCaloCompatibility
  include "RecoMuon/MuonIdentification/data/caloCompatibility.cff"
+include "TrackingTools/TrackAssociator/data/default.cfi"
 
 module calomuons = CaloMuonProducer {
 
       # TrackDetectorAssociator
-      include "TrackingTools/TrackAssociator/data/default.cfi"
-     
+      using TrackAssociatorParameterBlock 
       using MuonCaloCompatibilityBlock
 
       InputTag inputTracks = generalTracks
