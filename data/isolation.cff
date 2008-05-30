@@ -1,6 +1,7 @@
 # -*-SH-*-
 include "RecoMuon/MuonIsolationProducers/data/caloExtractorByAssociatorBlocks.cff"
 include "RecoMuon/MuonIsolationProducers/data/trackExtractorBlocks.cff"
+include "RecoMuon/MuonIsolationProducers/data/jetExtractorBlock.cff"
 
 block MIdIsoExtractorPSetBlock = {
   PSet CaloExtractorPSet = 
@@ -11,5 +12,10 @@ block MIdIsoExtractorPSetBlock = {
   PSet TrackExtractorPSet = 
   {
     using MIsoTrackExtractorBlock
+  }
+
+  PSet JetExtractorPSet = 
+  {
+    using MIsoJetExtractorBlock
   }
 }
