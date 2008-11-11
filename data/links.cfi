@@ -1,4 +1,0 @@
-module globalMuonLinks = MuonLinksProducer {
-      InputTag inputCollection = "muons"
-}
-
