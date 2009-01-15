@@ -5,7 +5,7 @@
 // 
 //
 // Original Author:  Dmytro Kovalskyi
-// $Id: MuonIdProducer.cc,v 1.28 2008/10/07 02:28:33 dmytro Exp $
+// $Id: MuonIdProducer.cc,v 1.29 2008/11/11 10:19:15 ptraczyk Exp $
 //
 //
 
@@ -288,7 +288,7 @@ void MuonIdProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
    
    // TimerStack timers;
    // timers.push("MuonIdProducer::produce");
-   
+
    std::auto_ptr<reco::MuonCollection> outputMuons(new reco::MuonCollection);
    init(iEvent, iSetup);
 
@@ -466,14 +466,16 @@ void MuonIdProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
         if ( ! muon->standAloneMuon().isNull() )	
           muonTime = theTimingExtractor_->fillTiming(iEvent,iSetup,muon->standAloneMuon());
 
-        LogTrace("MuonIdentification") << "Global 1/beta: " << muonTime.inverseBeta << " +/- " << muonTime.inverseBetaErr
-                                       << "  # of points: " << muonTime.nStations <<std::endl;
-        LogTrace("MuonIdentification") << "  Free 1/beta: " << muonTime.freeInverseBeta << " +/- " << muonTime.freeInverseBetaErr<<std::endl;
-        LogTrace("MuonIdentification") << "  Vertex time (in-out): " << muonTime.timeAtIpInOut << " +/- " << muonTime.timeAtIpInOutErr<<std::endl;
-        LogTrace("MuonIdentification") << "  Vertex time (out-in): " << muonTime.timeAtIpOutIn << " +/- " << muonTime.timeAtIpOutInErr<<std::endl;
-        LogTrace("MuonIdentification") << "  direction: "   << muonTime.direction() << std::endl;
-                                       
-        muon->setTime(muonTime);                                       
+        if (muonTime.nStations) {
+          LogTrace("MuonIdentification") << "Global 1/beta: " << muonTime.inverseBeta << " +/- " << muonTime.inverseBetaErr<<std::endl;
+          LogTrace("MuonIdentification") << "  Free 1/beta: " << muonTime.freeInverseBeta << " +/- " << muonTime.freeInverseBetaErr<<std::endl;
+          LogTrace("MuonIdentification") << "  Vertex time (in-out): " << muonTime.timeAtIpInOut << " +/- " << muonTime.timeAtIpInOutErr
+                                         << "  # of points: " << muonTime.nStations <<std::endl;
+          LogTrace("MuonIdentification") << "  Vertex time (out-in): " << muonTime.timeAtIpOutIn << " +/- " << muonTime.timeAtIpOutInErr<<std::endl;
+          LogTrace("MuonIdentification") << "  direction: "   << muonTime.direction() << std::endl;
+        
+          muon->setTime(muonTime);
+        }  
  	
      }
 	
