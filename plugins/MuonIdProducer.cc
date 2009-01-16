@@ -5,7 +5,7 @@
 // 
 //
 // Original Author:  Dmytro Kovalskyi
-// $Id: MuonIdProducer.cc,v 1.29 2008/11/11 10:19:15 ptraczyk Exp $
+// $Id: MuonIdProducer.cc,v 1.29.2.1 2009/01/15 13:32:51 ptraczyk Exp $
 //
 //
 
@@ -376,8 +376,8 @@ void MuonIdProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 		       {
 			  newMuon = false;
 			  muon->setMatches( trackerMuon.matches() );
-			  muon->setTime( trackerMuon.time() );
-			  muon->setCalEnergy( trackerMuon.calEnergy() );
+			  if (trackerMuon.isTimeValid()) muon->setTime( trackerMuon.time() );
+			  if (trackerMuon.isEnergyValid()) muon->setCalEnergy( trackerMuon.calEnergy() );
 			  muon->setType( muon->type() | reco::Muon::TrackerMuon );
 			  LogTrace("MuonIdentification") << "Found a corresponding global muon. Set energy, matches and move on";
 			  break;
