@@ -5,7 +5,7 @@
 // 
 //
 // Original Author:  Dmytro Kovalskyi
-// $Id: MuonIdProducer.cc,v 1.29 2008/11/11 10:19:15 ptraczyk Exp $
+// $Id: MuonIdProducer.cc,v 1.31 2009/01/15 16:03:14 ptraczyk Exp $
 //
 //
 
@@ -376,8 +376,8 @@ void MuonIdProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 		       {
 			  newMuon = false;
 			  muon->setMatches( trackerMuon.matches() );
-			  muon->setTime( trackerMuon.time() );
-			  muon->setCalEnergy( trackerMuon.calEnergy() );
+			  if (trackerMuon.isTimeValid()) muon->setTime( trackerMuon.time() );
+			  if (trackerMuon.isEnergyValid()) muon->setCalEnergy( trackerMuon.calEnergy() );
 			  muon->setType( muon->type() | reco::Muon::TrackerMuon );
 			  LogTrace("MuonIdentification") << "Found a corresponding global muon. Set energy, matches and move on";
 			  break;
@@ -466,15 +466,17 @@ void MuonIdProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
         if ( ! muon->standAloneMuon().isNull() )	
           muonTime = theTimingExtractor_->fillTiming(iEvent,iSetup,muon->standAloneMuon());
 
-        LogTrace("MuonIdentification") << "Global 1/beta: " << muonTime.inverseBeta << " +/- " << muonTime.inverseBetaErr
-                                       << "  # of points: " << muonTime.nStations <<std::endl;
-        LogTrace("MuonIdentification") << "  Free 1/beta: " << muonTime.freeInverseBeta << " +/- " << muonTime.freeInverseBetaErr<<std::endl;
-        LogTrace("MuonIdentification") << "  Vertex time (in-out): " << muonTime.timeAtIpInOut << " +/- " << muonTime.timeAtIpInOutErr<<std::endl;
-        LogTrace("MuonIdentification") << "  Vertex time (out-in): " << muonTime.timeAtIpOutIn << " +/- " << muonTime.timeAtIpOutInErr<<std::endl;
-        LogTrace("MuonIdentification") << "  direction: "   << muonTime.direction() << std::endl;
-                                       
-        muon->setTime(muonTime);                                       
- 	
+        if (muonTime.nStations) {
+          LogTrace("MuonIdentification") << "Global 1/beta: " << muonTime.inverseBeta << " +/- " << muonTime.inverseBetaErr<<std::endl;
+          LogTrace("MuonIdentification") << "  Free 1/beta: " << muonTime.freeInverseBeta << " +/- " << muonTime.freeInverseBetaErr<<std::endl;
+          LogTrace("MuonIdentification") << "  Vertex time (in-out): " << muonTime.timeAtIpInOut << " +/- " << muonTime.timeAtIpInOutErr
+                                         << "  # of points: " << muonTime.nStations <<std::endl;
+          LogTrace("MuonIdentification") << "  Vertex time (out-in): " << muonTime.timeAtIpOutIn << " +/- " << muonTime.timeAtIpOutInErr<<std::endl;
+          LogTrace("MuonIdentification") << "  direction: "   << muonTime.direction() << std::endl;
+        
+          muon->setTime(muonTime);
+        }  
+
      }
 	
    LogTrace("MuonIdentification") << "number of muons produced: " << outputMuons->size();
