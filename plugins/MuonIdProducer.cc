@@ -5,7 +5,7 @@
 // 
 //
 // Original Author:  Dmytro Kovalskyi
-// $Id: MuonIdProducer.cc,v 1.45 2009/09/26 19:56:38 dmytro Exp $
+// $Id: MuonIdProducer.cc,v 1.46 2009/09/27 08:47:26 dmytro Exp $
 //
 //
 
@@ -62,6 +62,7 @@ muIsoExtractorCalo_(0),muIsoExtractorTrack_(0),muIsoExtractorJet_(0)
    
    minPt_                   = iConfig.getParameter<double>("minPt");
    minP_                    = iConfig.getParameter<double>("minP");
+   minPCaloMuon_            = iConfig.getParameter<double>("minPCaloMuon");
    minNumberOfMatches_      = iConfig.getParameter<int>("minNumberOfMatches");
    addExtraSoftMuons_       = iConfig.getParameter<bool>("addExtraSoftMuons");
    maxAbsEta_               = iConfig.getParameter<double>("maxAbsEta");
@@ -238,7 +239,7 @@ reco::Muon MuonIdProducer::makeMuon( const reco::MuonTrackLinks& links )
 bool MuonIdProducer::isGoodTrack( const reco::Track& track )
 {
    // Pt and absolute momentum requirement
-   if (track.pt() < minPt_ || track.p() < minP_){ 
+   if (track.pt() < minPt_ || (track.p() < minP_ && track.p() < minPCaloMuon_)){ 
       LogTrace("MuonIdentification") << "Skipped low momentum track (Pt,P): " << track.pt() <<
 	", " << track.p() << " GeV";
       return false;
@@ -426,7 +427,7 @@ void MuonIdProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 		   } else {
 		      LogTrace("MuonIdentification") << "track failed minimal number of muon matches requirement";
 		      const reco::CaloMuon& caloMuon = makeCaloMuon(trackerMuon);
-		      if ( ! caloMuon.isCaloCompatibilityValid() || caloMuon.caloCompatibility() < caloCut_ ) continue;
+		      if ( ! caloMuon.isCaloCompatibilityValid() || caloMuon.caloCompatibility() < caloCut_ || caloMuon.p() < minPCaloMuon_) continue;
 		      caloMuons->push_back( caloMuon );
 		   }
 		}
@@ -566,6 +567,7 @@ void MuonIdProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 bool MuonIdProducer::isGoodTrackerMuon( const reco::Muon& muon )
 {
+  if(muon.track()->pt() < minPt_ || muon.track()->p() < minP_) return false;
    if ( addExtraSoftMuons_ && 
 	muon.pt()<5 && fabs(muon.eta())<1.5 && 
 	muon.numberOfMatches( reco::Muon::NoArbitration ) >= 1 ) return true;
