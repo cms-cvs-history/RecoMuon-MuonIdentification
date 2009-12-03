@@ -12,7 +12,7 @@
 //
 // Original Author:  Piotr Traczyk, CERN
 //         Created:  Mon Mar 16 12:27:22 CET 2009
-// $Id: MuonTimingFiller.cc,v 1.2 2009/07/30 09:59:56 ptraczyk Exp $
+// $Id: MuonTimingFiller.cc,v 1.5 2009/10/19 16:40:59 ptraczyk Exp $
 //
 //
 
@@ -37,7 +37,6 @@
 #include "RecoMuon/MuonIdentification/interface/MuonTimingFiller.h"
 #include "RecoMuon/MuonIdentification/interface/TimeMeasurementSequence.h"
 
-
 //
 // constructors and destructor
 //
@@ -50,12 +49,24 @@ MuonTimingFiller::MuonTimingFiller(const edm::ParameterSet& iConfig)
    // Load parameters for the CSCTimingExtractor
    edm::ParameterSet cscTimingParameters = iConfig.getParameter<edm::ParameterSet>("CSCTimingParameters");
    theCSCTimingExtractor_ = new CSCTimingExtractor(cscTimingParameters);
+   
+   errorDT_ = iConfig.getParameter<double>("ErrorDT");
+   errorCSC_ = iConfig.getParameter<double>("ErrorCSC");
+   errorEB_ = iConfig.getParameter<double>("ErrorEB");
+   errorEE_ = iConfig.getParameter<double>("ErrorEE");
+   ecalEcut_ = iConfig.getParameter<double>("EcalEnergyCut");
+   
+   useDT_ = iConfig.getParameter<bool>("UseDT");
+   useCSC_ = iConfig.getParameter<bool>("UseCSC");
+   useECAL_ = iConfig.getParameter<bool>("UseECAL");
+   
 }
 
 
 MuonTimingFiller::~MuonTimingFiller()
 {
-   if (theDTTimingExtractor_) delete theDTTimingExtractor_;
+  if (theDTTimingExtractor_) delete theDTTimingExtractor_;
+  if (theCSCTimingExtractor_) delete theCSCTimingExtractor_;
 }
 
 
@@ -72,23 +83,22 @@ MuonTimingFiller::fillTiming( const reco::Muon& muon, reco::MuonTimeExtra& dtTim
     theDTTimingExtractor_->fillTiming(dtTmSeq, muon.standAloneMuon(), iEvent, iSetup);
     theCSCTimingExtractor_->fillTiming(cscTmSeq, muon.standAloneMuon(), iEvent, iSetup);
   }
-     
+  
   // Fill DT-specific timing information block     
-  if (dtTmSeq.totalWeight)
-    fillTimeFromMeasurements(dtTmSeq, dtTime);
+  fillTimeFromMeasurements(dtTmSeq, dtTime);
 
   // Fill CSC-specific timing information block     
-  if (cscTmSeq.totalWeight)
-    fillTimeFromMeasurements(cscTmSeq, cscTime);
+  fillTimeFromMeasurements(cscTmSeq, cscTime);
        
-  // TODO - combine the TimeMeasurementSequences from all subdetectors
+  // Combine the TimeMeasurementSequences from all subdetectors
   TimeMeasurementSequence combinedTmSeq;
-          
+  combineTMSequences(muon,dtTmSeq,cscTmSeq,combinedTmSeq);
+  // add ECAL info
+  if (useECAL_) addEcalTime(muon,combinedTmSeq);
+
   // Fill the master timing block
-  // TEMPORARY! use DT only for now
-  if (dtTime.nDof())
-    fillTimeFromMeasurements(dtTmSeq, combinedTime);
-     
+  fillTimeFromMeasurements(combinedTmSeq, combinedTime);
+    
   LogTrace("MuonTime") << "Global 1/beta: " << combinedTime.inverseBeta() << " +/- " << combinedTime.inverseBetaErr()<<std::endl;
   LogTrace("MuonTime") << "  Free 1/beta: " << combinedTime.freeInverseBeta() << " +/- " << combinedTime.freeInverseBetaErr()<<std::endl;
   LogTrace("MuonTime") << "  Vertex time (in-out): " << combinedTime.timeAtIpInOut() << " +/- " << combinedTime.timeAtIpInOutErr()
@@ -106,6 +116,8 @@ MuonTimingFiller::fillTimeFromMeasurements( TimeMeasurementSequence tmSeq, reco:
   double invbeta=0, invbetaerr=0;
   double vertexTime=0, vertexTimeErr=0, vertexTimeR=0, vertexTimeRErr=0;    
   double freeBeta, freeBetaErr, freeTime, freeTimeErr;
+
+  if (tmSeq.dstnc.size()<=1) return;
 
   for (unsigned int i=0;i<tmSeq.dstnc.size();i++) {
     invbeta+=(1.+tmSeq.local_t0.at(i)/tmSeq.dstnc.at(i)*30.)*tmSeq.weight.at(i)/tmSeq.totalWeight;
@@ -125,9 +137,10 @@ MuonTimingFiller::fillTimeFromMeasurements( TimeMeasurementSequence tmSeq, reco:
     vertexTimeRErr+=diff*diff*tmSeq.weight.at(i);
   }
   
-  invbetaerr=sqrt(invbetaerr/tmSeq.totalWeight);
-  vertexTimeErr=sqrt(vertexTimeErr/tmSeq.totalWeight);
-  vertexTimeRErr=sqrt(vertexTimeRErr/tmSeq.totalWeight);
+  double cf = 1./(tmSeq.dstnc.size()-1);
+  invbetaerr=sqrt(invbetaerr/tmSeq.totalWeight*cf);
+  vertexTimeErr=sqrt(vertexTimeErr/tmSeq.totalWeight*cf);
+  vertexTimeRErr=sqrt(vertexTimeRErr/tmSeq.totalWeight*cf);
 
   muTime.setInverseBeta(invbeta);
   muTime.setInverseBetaErr(invbetaerr);
@@ -141,8 +154,60 @@ MuonTimingFiller::fillTimeFromMeasurements( TimeMeasurementSequence tmSeq, reco:
   muTime.setFreeInverseBeta(freeBeta);
   muTime.setFreeInverseBetaErr(freeBetaErr);
     
-  muTime.setNDof((int)tmSeq.totalWeight);
+  muTime.setNDof(tmSeq.dstnc.size());
+}
 
+void 
+MuonTimingFiller::combineTMSequences( const reco::Muon& muon, 
+                                      TimeMeasurementSequence dtSeq, 
+                                      TimeMeasurementSequence cscSeq, 
+                                      TimeMeasurementSequence &cmbSeq ) {
+  double hitWeight;
+                                        
+  if (useDT_) for (unsigned int i=0;i<dtSeq.dstnc.size();i++) {
+    hitWeight=dtSeq.weight.at(i) / (errorDT_*errorDT_);
+    
+    cmbSeq.dstnc.push_back(dtSeq.dstnc.at(i));
+    cmbSeq.local_t0.push_back(dtSeq.local_t0.at(i));
+    cmbSeq.weight.push_back(hitWeight);
+
+    cmbSeq.totalWeight+=hitWeight;
+  }
+
+  if (useCSC_) for (unsigned int i=0;i<cscSeq.dstnc.size();i++) {
+    hitWeight=1./(errorCSC_*errorCSC_);
+ 
+    cmbSeq.dstnc.push_back(cscSeq.dstnc.at(i));
+    cmbSeq.local_t0.push_back(cscSeq.local_t0.at(i));
+    cmbSeq.weight.push_back(hitWeight);
+
+    cmbSeq.totalWeight+=hitWeight;
+  }
+}
+
+
+void 
+MuonTimingFiller::addEcalTime( const reco::Muon& muon, 
+                               TimeMeasurementSequence &cmbSeq ) {
+
+  reco::MuonEnergy muonE;
+  if (muon.isEnergyValid())  
+    muonE = muon.calEnergy();
+  
+  // Cut on the crystal energy and restrict to the ECAL barrel for now
+  if (muonE.emMax<ecalEcut_ || fabs(muon.eta())>1.5) return;    
+  
+  // A simple parametrization of the error on the ECAL time measurement
+  double emErr = errorEB_/muonE.emMax;
+  double hitWeight = 1/(emErr*emErr);
+        
+  cmbSeq.local_t0.push_back(muonE.ecal_time);
+  cmbSeq.weight.push_back(hitWeight);
+
+  cmbSeq.dstnc.push_back(muonE.ecal_position.r());
+  
+  cmbSeq.totalWeight+=hitWeight;
+                                      
 }
 
 

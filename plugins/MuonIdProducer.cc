@@ -5,7 +5,7 @@
 // 
 //
 // Original Author:  Dmytro Kovalskyi
-// $Id: MuonIdProducer.cc,v 1.42 2009/09/23 12:28:03 ptraczyk Exp $
+// $Id: MuonIdProducer.cc,v 1.46 2009/09/27 08:47:26 dmytro Exp $
 //
 //
 
@@ -62,6 +62,7 @@ muIsoExtractorCalo_(0),muIsoExtractorTrack_(0),muIsoExtractorJet_(0)
    
    minPt_                   = iConfig.getParameter<double>("minPt");
    minP_                    = iConfig.getParameter<double>("minP");
+   minPCaloMuon_            = iConfig.getParameter<double>("minPCaloMuon");
    minNumberOfMatches_      = iConfig.getParameter<int>("minNumberOfMatches");
    addExtraSoftMuons_       = iConfig.getParameter<bool>("addExtraSoftMuons");
    maxAbsEta_               = iConfig.getParameter<double>("maxAbsEta");
@@ -238,7 +239,7 @@ reco::Muon MuonIdProducer::makeMuon( const reco::MuonTrackLinks& links )
 bool MuonIdProducer::isGoodTrack( const reco::Track& track )
 {
    // Pt and absolute momentum requirement
-   if (track.pt() < minPt_ || track.p() < minP_){ 
+   if (track.pt() < minPt_ || (track.p() < minP_ && track.p() < minPCaloMuon_)){ 
       LogTrace("MuonIdentification") << "Skipped low momentum track (Pt,P): " << track.pt() <<
 	", " << track.p() << " GeV";
       return false;
@@ -403,6 +404,7 @@ void MuonIdProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 		// have to check where muon hits are really located
 		// to match properly
 		bool newMuon = true;
+		bool goodTrackerMuon = isGoodTrackerMuon( trackerMuon );
 		for ( reco::MuonCollection::iterator muon = outputMuons->begin();
 		      muon !=  outputMuons->end(); ++muon )
 		  {
@@ -414,19 +416,21 @@ void MuonIdProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 			  muon->setMatches( trackerMuon.matches() );
 			  if (trackerMuon.isTimeValid()) muon->setTime( trackerMuon.time() );
 			  if (trackerMuon.isEnergyValid()) muon->setCalEnergy( trackerMuon.calEnergy() );
-			  muon->setType( muon->type() | reco::Muon::TrackerMuon );
+			  if (goodTrackerMuon) muon->setType( muon->type() | reco::Muon::TrackerMuon );
 			  LogTrace("MuonIdentification") << "Found a corresponding global muon. Set energy, matches and move on";
 			  break;
 		       }
 		  }
-		if ( ! isGoodTrackerMuon( trackerMuon ) ){
-		   LogTrace("MuonIdentification") << "track failed minimal number of muon matches requirement";
-		   const reco::CaloMuon& caloMuon = makeCaloMuon(trackerMuon);
-		   if ( ! caloMuon.isCaloCompatibilityValid() || caloMuon.caloCompatibility() < caloCut_ ) continue;
-		   caloMuons->push_back( caloMuon );
-		   continue;
+		if ( newMuon ) {
+		   if ( goodTrackerMuon ){
+		      outputMuons->push_back( trackerMuon );
+		   } else {
+		      LogTrace("MuonIdentification") << "track failed minimal number of muon matches requirement";
+		      const reco::CaloMuon& caloMuon = makeCaloMuon(trackerMuon);
+		      if ( ! caloMuon.isCaloCompatibilityValid() || caloMuon.caloCompatibility() < caloCut_ || caloMuon.p() < minPCaloMuon_) continue;
+		      caloMuons->push_back( caloMuon );
+		   }
 		}
-		if ( newMuon ) outputMuons->push_back( trackerMuon );
 	     }
 	}
    }
@@ -563,6 +567,7 @@ void MuonIdProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 bool MuonIdProducer::isGoodTrackerMuon( const reco::Muon& muon )
 {
+  if(muon.track()->pt() < minPt_ || muon.track()->p() < minP_) return false;
    if ( addExtraSoftMuons_ && 
 	muon.pt()<5 && fabs(muon.eta())<1.5 && 
 	muon.numberOfMatches( reco::Muon::NoArbitration ) >= 1 ) return true;
@@ -923,6 +928,13 @@ double MuonIdProducer::phiOfMuonIneteractionRegion( const reco::Muon& muon ) con
 {
    if ( muon.isStandAloneMuon() ) return muon.standAloneMuon()->innerPosition().phi();
    // the rest is tracker muon only
+   if ( muon.matches().empty() ){
+      if ( muon.innerTrack().isAvailable() &&
+	   muon.innerTrack()->extra().isAvailable() )
+	return muon.innerTrack()->outerPosition().phi();
+      else
+	return muon.phi(); // makes little sense, but what else can I use
+   }
    return sectorPhi(muon.matches().at(0).id);
 }
 

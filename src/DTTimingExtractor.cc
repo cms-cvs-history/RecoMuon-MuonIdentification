@@ -5,13 +5,13 @@
 // 
 /**\class DTTimingExtractor DTTimingExtractor.cc RecoMuon/MuonIdentification/src/DTTimingExtractor.cc
  *
- * Description: <one line class summary>
+ * Description: Produce timing information for a muon track using 1D DT hits from segments used to build the track
  *
  */
 //
 // Original Author:  Traczyk Piotr
 //         Created:  Thu Oct 11 15:01:28 CEST 2007
-// $Id: DTTimingExtractor.cc,v 1.2 2009/06/08 08:37:07 ptraczyk Exp $
+// $Id: DTTimingExtractor.cc,v 1.3 2009/06/16 15:40:56 ptraczyk Exp $
 //
 //
 
@@ -83,6 +83,7 @@ DTTimingExtractor::DTTimingExtractor(const edm::ParameterSet& iConfig)
   theHitsMin_(iConfig.getParameter<int>("HitsMin")),
   thePruneCut_(iConfig.getParameter<double>("PruneCut")),
   useSegmentT0_(iConfig.getParameter<bool>("UseSegmentT0")),
+  doWireCorr_(iConfig.getParameter<bool>("DoWireCorr")),
   requireBothProjections_(iConfig.getParameter<bool>("RequireBothProjections")),
   debug(iConfig.getParameter<bool>("debug"))
 {
@@ -98,6 +99,7 @@ DTTimingExtractor::DTTimingExtractor(const edm::ParameterSet& iConfig)
 DTTimingExtractor::~DTTimingExtractor()
 {
   if (theService) delete theService;
+  if (theMatcher) delete theMatcher;
 }
 
 
@@ -118,6 +120,10 @@ DTTimingExtractor::fillTiming(TimeMeasurementSequence &tmSequence, reco::TrackRe
   theService->update(iSetup);
 
   const GlobalTrackingGeometry *theTrackingGeometry = &*theService->trackingGeometry();
+
+  // get the DT geometry
+  ESHandle<DTGeometry> theDTGeom;
+  iSetup.get<MuonGeometryRecord>().get(theDTGeom);
   
   edm::ESHandle<Propagator> propagator;
   iSetup.get<TrackingComponentsRecord>().get("SteppingHelixPropagatorAny", propagator);
@@ -146,8 +152,8 @@ DTTimingExtractor::fillTiming(TimeMeasurementSequence &tmSequence, reco::TrackRe
     int station = chamberId.station();
 
     // use only segments with both phi and theta projections present (optional)
-    if (requireBothProjections_)
-      if ( (!(*rechit)->hasPhi()) || (!(*rechit)->hasZed()) ) continue;
+    bool bothProjections = ( ((*rechit)->hasPhi()) && ((*rechit)->hasZed()) );
+    if (requireBothProjections_ && !bothProjections) continue;
 
     // loop over (theta, phi) segments
     for (int phi=0; phi<2; phi++) {
@@ -183,6 +189,16 @@ DTTimingExtractor::fillTiming(TimeMeasurementSequence &tmSequence, reco::TrackRe
 	thisHit.station = station;
 	if (useSegmentT0_) thisHit.timeCorr=segm->t0();
 	  else thisHit.timeCorr=0.;
+	  
+	// signal propagation along the wire correction for unmached theta or phi segment hits
+	if (doWireCorr_ && !bothProjections) {
+	  const DTLayer* layer = theDTGeom->layer(hiti->wireId());
+	  float propgL = layer->toLocal( tsos.first.globalPosition() ).y();
+	  float wirePropCorr = propgL/24.4*0.00543; // signal propagation speed along the wire
+	  if (thisHit.isLeft) wirePropCorr=-wirePropCorr;
+	  thisHit.posInLayer += wirePropCorr;
+	} 
+	  
 	tms.push_back(thisHit);
       }
     } // phi = (0,1) 	        
@@ -277,8 +293,6 @@ DTTimingExtractor::fillTiming(TimeMeasurementSequence &tmSequence, reco::TrackRe
 	totalWeight+=seg.size()-2;
       }
 
-    invbeta=0;
-    
     if (totalWeight==0) break;        
 
     // calculate the value and error of 1/beta from the complete set of 1D hits
@@ -286,6 +300,7 @@ DTTimingExtractor::fillTiming(TimeMeasurementSequence &tmSequence, reco::TrackRe
       cout << " Points for global fit: " << dstnc.size() << endl;
 
     // inverse beta - weighted average of the contributions from individual hits
+    invbeta=0;
     for (unsigned int i=0;i<dstnc.size();i++) 
       invbeta+=(1.+dsegm.at(i)/dstnc.at(i)*30.)*hitWeight.at(i)/totalWeight;
 
@@ -298,7 +313,7 @@ DTTimingExtractor::fillTiming(TimeMeasurementSequence &tmSequence, reco::TrackRe
       diff=(1.+dsegm.at(i)/dstnc.at(i)*30.)-invbeta;
       diff=diff*diff*hitWeight.at(i);
       invbetaerr+=diff;
-      if (diff/totalWeight/totalWeight>chimax/100.) { 
+      if (diff/totalWeight>chimax) { 
 	tmmax=tms.begin()+hit_idx.at(i);
 	chimax=diff;
       }
